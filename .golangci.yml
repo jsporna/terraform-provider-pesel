@@ -1,0 +1,12 @@
+linters:
+  enable:
+    - durationcheck
+    - exportloopref
+    - godot
+    - gofmt
+    - makezero
+    - misspell
+    - nilerr
+    - predeclared
+    - unconvert
+    - unparam
