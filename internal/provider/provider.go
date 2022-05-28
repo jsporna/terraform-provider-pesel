@@ -10,8 +10,12 @@ func init() {
 
 func New() *schema.Provider {
 	return &schema.Provider{
-		Schema:         map[string]*schema.Schema{},
-		ResourcesMap:   map[string]*schema.Resource{},
-		DataSourcesMap: map[string]*schema.Resource{},
+		Schema: map[string]*schema.Schema{},
+		ResourcesMap: map[string]*schema.Resource{
+			"pesel_id": peselIdResource(),
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"pesel_id": peselIdData(),
+		},
 	}
 }
