@@ -6,9 +6,8 @@ terraform {
   }
 }
 
-provider "pesel" {}
-
-resource "pesel_id" "random" {}
+resource "pesel_id" "random" {
+}
 
 data "pesel_id" "somebody" {
   id = "65432101239"
@@ -18,6 +17,6 @@ output "random" {
   value = pesel_id.random
 }
 
-output "bulwa" {
+output "somebody" {
   value = data.pesel_id.somebody
 }
