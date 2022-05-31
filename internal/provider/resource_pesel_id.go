@@ -14,59 +14,61 @@ func peselIdResource() *schema.Resource {
 		Description:   ``,
 		CreateContext: peselIdResourceWrite,
 		DeleteContext: peselIdResourceDelete,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   peselIdResourceRead,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"year": {
-				Description: "",
+				Description: "Year of birthday of person described by generated PESEL ID",
 				Type:        schema.TypeInt,
 				Optional:    true,
 				ForceNew:    true,
 			},
 			"month": {
-				Description: "",
+				Description: "Month of birthday of person described by generated PESEL ID",
 				Type:        schema.TypeInt,
 				Optional:    true,
 				ForceNew:    true,
 			},
 			"day": {
-				Description: "",
+				Description: "Day of birthday of person described by generated PESEL ID",
 				Type:        schema.TypeInt,
 				Optional:    true,
 				ForceNew:    true,
 			},
 			"gender": {
-				Description: "",
+				Description: "Gender of person described by generated PESEL ID",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "male",
 				ForceNew:    true,
 			},
 			"date": {
-				Description: "",
+				Description: "Date of birthday of person described by generated PESEL ID",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
 			"male": {
-				Description: "",
+				Description: "Does PESEL ID belong to male person",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"female": {
-				Description: "",
+				Description: "Does PESEL ID belong to female person",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Generate PESEL ID",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}
 }
 
-func peselIdResourceWrite(_ context.Context, d *schema.ResourceData, _ interface{}) diag.Diagnostics {
+func peselIdResourceWrite(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	year := d.Get("year").(int)
@@ -82,6 +84,7 @@ func peselIdResourceWrite(_ context.Context, d *schema.ResourceData, _ interface
 	}
 
 	rand.Seed(time.Now().UnixNano())
+
 	var _gender int
 	if gender == "" {
 		_gender = rand.Intn(2)
@@ -152,15 +155,6 @@ func peselIdResourceWrite(_ context.Context, d *schema.ResourceData, _ interface
 	_checksum := checksum(_subPesel)
 	_pesel := fmt.Sprintf("%s%d", _subPesel, _checksum)
 
-	if err := d.Set("year", _year); err != nil {
-		return diag.FromErr(err)
-	}
-	if err := d.Set("month", _month); err != nil {
-		return diag.FromErr(err)
-	}
-	if err := d.Set("day", _day); err != nil {
-		return diag.FromErr(err)
-	}
 	if err := d.Set("date", fmt.Sprintf("%d-%02d-%02d", _year, _month, _day)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -170,11 +164,13 @@ func peselIdResourceWrite(_ context.Context, d *schema.ResourceData, _ interface
 	if err := d.Set("female", _gender == 0); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("gender", INT2GENDER[_gender]); err != nil {
-		return diag.FromErr(err)
-	}
+
 	d.SetId(_pesel)
 
+	return diags
+}
+
+func peselIdResourceRead(_ context.Context, d *schema.ResourceData, _ interface{}) diag.Diagnostics {
 	return nil
 }
 

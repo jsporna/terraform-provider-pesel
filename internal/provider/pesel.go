@@ -24,6 +24,7 @@ var INT2GENDER = map[int]string{
 }
 
 var MONTHSOFYEAR = [13]int{31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+var WEIGHTS = [10]int{1, 3, 7, 9, 1, 3, 7, 9, 1, 3}
 
 func isLeapYear(year int) bool {
 	leapFlag := false
@@ -81,5 +82,12 @@ func randomGenderValue(gender int) int {
 func checksum(pesel string) int {
 	_checksum := 0
 
-	return _checksum
+	for idx, char := range pesel {
+		if idx > 9 {
+			break
+		}
+		_checksum += WEIGHTS[idx] * (int(char) - '0')
+	}
+
+	return (10 - (_checksum % 10)) % 10
 }
