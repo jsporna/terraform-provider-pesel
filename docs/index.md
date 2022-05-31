@@ -24,21 +24,18 @@ terraform {
   }
 }
 
-provider "pesel" {}
-
 resource "pesel_id" "random" {
-  day = 29
 }
 
-data "pesel_id" "bulwa" {
-  id = "83272809010"
+data "pesel_id" "somebody" {
+  id = "65432101239"
 }
 
 output "random" {
   value = pesel_id.random
 }
 
-output "bulwa" {
-  value = data.pesel_id.bulwa
+output "somebody" {
+  value = data.pesel_id.somebody
 }
 ```
