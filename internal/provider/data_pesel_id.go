@@ -11,46 +11,52 @@ import (
 func peselIdData() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: peselIdDataRead,
+		Description: `The ` + "`pesel_id`" + ` data source implements the standard data source lifecycle but does not interact with any external APIs.
+
+Get information about provided PESEL ID like date of birthday, gender. Additionally data source validates checksum of ID.
+More information about PESEL ID on [wikipedia](https://en.wikipedia.org/wiki/PESEL).
+`,
 		Schema: map[string]*schema.Schema{
 			"year": {
-				Description: "",
+				Description: "Year of birthday of person described by PESEL ID",
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
 			"month": {
-				Description: "",
+				Description: "Month of birthday of person described by PESEL ID",
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
 			"day": {
-				Description: "",
+				Description: "Day of birthday of person described by PESEL ID",
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
 			"gender": {
-				Description: "",
+				Description: "Gender of person described by PESEL ID",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
 			"date": {
-				Description: "",
+				Description: "Date of birthday of person described by PESEL ID",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
 			"male": {
-				Description: "",
+				Description: "Does PESEL ID belong to male person",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"female": {
-				Description: "",
+				Description: "Does PESEL ID belong to female person",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "PESEL ID",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -63,9 +69,17 @@ func peselIdDataRead(_ context.Context, d *schema.ResourceData, _ interface{}) d
 		if c < '0' || c > '9' {
 			return append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Pesel cointains not only digits",
+				Summary:  "Provided PESEL ID contains not only digits",
 			})
 		}
+	}
+	calculatedChecksum := checksum(pesel)
+	peselChecksum := int(pesel[10]) - '0'
+	if calculatedChecksum != peselChecksum {
+		return append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  fmt.Sprintf("Provided PESEL ID has not valid checksum; pesel: %s, cs: %d, calc: %d", pesel, peselChecksum, calculatedChecksum),
+		})
 	}
 	year, _ := strconv.Atoi(pesel[0:2])
 	month, _ := strconv.Atoi(pesel[2:4])
