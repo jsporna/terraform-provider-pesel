@@ -19,4 +19,4 @@ bin/
 terraform-provider-pesel
 examples/**/.terraform
 examples/**/.terraform.lock.hcl
-examples/**/terraform.tfstate*
+examples/**/terraform.tfstate
